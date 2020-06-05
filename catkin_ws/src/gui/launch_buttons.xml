@@ -1,0 +1,20 @@
+<library path="src">
+  <class name="Launch Buttons" type="launch_buttons.launch_buttons_plugin.LaunchButtonsPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A GUI that makes the basic functionality of our robot more accessible.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Robot Basics</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Basic Accessibility Features.</statustip>
+    </qtgui>
+  </class>
+</library>
