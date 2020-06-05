@@ -2,9 +2,9 @@
 
 import sys
 
-from gui.launch_buttons_plugin import LaunchButtonsPlugin
+#from launch_buttons.launch_buttons_plugin import LaunchButtonsPlugin
 from rqt_gui.main import Main
 
-plugin = 'gui/launch_buttons_plugin'
-main = Main(filename=plugin)
+plugin = 'gui'
+main = Main()
 sys.exit(main.main(standalone=plugin))
