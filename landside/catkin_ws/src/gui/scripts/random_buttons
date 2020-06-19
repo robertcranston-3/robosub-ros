@@ -6,13 +6,13 @@ import os
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
-final_path = os.path.join(parentdir, 'src', 'launch_buttons')
+final_path = os.path.join(parentdir, 'src')
+
 sys.path.append(final_path)
 
-print('AAAAFHGAFSDGHFAGHSDF')
-from launch_buttons_plugin import LaunchButtonsPlugin
+from random_buttons.random_buttons_plugin import RandomButtonsPlugin
 from rqt_gui.main import Main
 
-plugin = 'launch_buttons'
+plugin = 'random_buttons'
 main = Main(filename=plugin)
 sys.exit(main.main(standalone=plugin))

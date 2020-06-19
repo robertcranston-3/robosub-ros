@@ -1,7 +1,7 @@
 <library path="src">
-  <class name="Launch Buttons" type="launch_buttons_plugin.LaunchButtonsPlugin" base_class_type="rqt_gui_py::Plugin">
+  <class name="Random Buttons" type="random_buttons_plugin.RandomButtonsPlugin" base_class_type="rqt_gui_py::Plugin">
     <description>
-      A GUI that makes the basic functionality of our robot more accessible.
+      A GUI that does random stuff.
     </description>
     <qtgui>
       <!-- optional grouping...
@@ -12,9 +12,9 @@
         <label>Subgroup</label>
       </group>
       -->
-      <label>Robot Basics</label>
+      <label>Random Stuff</label>
       <icon type="theme">system-help</icon>
-      <statustip>Basic Accessibility Features.</statustip>
+      <statustip>Random Testing Features.</statustip>
     </qtgui>
   </class>
 </library>

@@ -64,5 +64,6 @@
   <export>
     <!-- Other tools can request additional information be placed here -->
     <rqt_gui plugin="${prefix}/launch_buttons.xml"/>
+    <rqt_gui plugin="${prefix}/random_buttons.xml"/>
   </export>
 </package>
