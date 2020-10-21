@@ -1,9 +1,6 @@
-#define RHO 1000        // density of water
-#define WATER_HEIGHT 0  // the z height of the water
-
-int arr[3];
-
-int* arr1
+#define RHO 1000            // density of water
+#define WATER_HEIGHT 0      // the z height of the water
+#define QUADRATIC_DRAG 1    // true is drag should be quadratic, rather than linear
 
 float grav_vector[3];
 float grav;
@@ -70,4 +67,33 @@ int calcBuoyancy(int handle, float* buoy) {
     buoy[0] = 0;
     buoy[1] = 0;
     buoy[2] = buoyForce;
+}
+
+float* getLinDrag(float dragCoef, float* linVel, int linVelSize, float diameter, float height){
+	float dragForce[3];
+	for (int i = 0; i < linVelSize; i++){
+		dragForce[i] = 0.5 * 1000 * dragCoef * area * linVel[i] * linVel[i];
+	}
+}
+
+void applyLinDrag(float* force, int objectHandle){
+
+}
+
+float* getLinVelocity(int objectHandle){
+	int velSize = 3;
+	float* linVel = (float*) malloc(sizeof(float) * velSize);
+	float* angVel = (float*) malloc(sizeof(float) * velSize);
+	int errorCode = simGetObjectVelocity(objectHandle, linVel, angVel);
+	free(angVel);
+	return linVel;
+}
+
+float* getAngVelocity(int objectHandle){
+	int velSize = 3;
+	float* linVel = (float*) malloc(sizeof(float) * velSize);
+	float* angVel = (float*) malloc(sizeof(float) * velSize);
+	int errorCode = simGetObjectVelocity(objectHandle, linVel, angVel);
+	free(linVel);
+	return angVel;
 }
