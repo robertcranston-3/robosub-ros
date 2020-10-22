@@ -80,6 +80,14 @@ void applyLinDrag(float* force, int objectHandle){
 
 }
 
+float* getPos(int objectHandle){
+    int posSize = 3;
+    float* pos = (float*) malloc(sizeof(float) * posSize);
+    int relativeToObjectHandle = -1;
+    int errorCode = simGetObjectPosition(objectHandle, relativeToObjectHandle, pos);
+    return pos;
+}
+
 float* getLinVelocity(int objectHandle){
 	int velSize = 3;
 	float* linVel = (float*) malloc(sizeof(float) * velSize);
