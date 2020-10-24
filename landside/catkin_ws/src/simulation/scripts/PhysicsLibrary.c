@@ -69,15 +69,20 @@ int calcBuoyancy(int handle, float* buoy) {
     buoy[2] = buoyForce;
 }
 
-float* getLinDrag(float dragCoef, float* linVel, int linVelSize, float diameter, float height){
-	float dragForce[3];
-	for (int i = 0; i < linVelSize; i++){
-		dragForce[i] = 0.5 * 1000 * dragCoef * area * linVel[i] * linVel[i];
+float* getLinDrag(float dragCoef, float* linVel, int linVelSize, float diameter, float length){
+    float* dragForce = (float*) malloc(3 * sizeof(float));
+    float pi = 3.1415926535897932384626433832;
+
+	for (int i = 1; i < 3; i++){
+		dragForce[i] = -0.5 * RHO * dragCoef * * linVel[i] * linVel[i];
 	}
+    dragForce[0] = -0.5 * RHO * dragCoef * pi * diameter * length * 0.5 * (diameter / 2)*(diameter / 2) * pi * linVel[i] * linVel[i];
+    return dragForce;
 }
 
 void applyLinDrag(float* force, int objectHandle){
-
+    simAddForceAndTorque(objectHandle, force, NULL);
+    free(force); //maybe?
 }
 
 float* getLinVelocity(int objectHandle){
@@ -96,4 +101,12 @@ float* getAngVelocity(int objectHandle){
 	int errorCode = simGetObjectVelocity(objectHandle, linVel, angVel);
 	free(linVel);
 	return angVel;
+}
+
+float* getAcc(float* prevVel, float* currVel, float timeStep){
+	float* accel = (float*) malloc(sizeof(float) * 3);
+	for (int i = 0; i < 3; i++){
+		*(accel+i) = (*(currVel+i) - *(prevVel+i)) / timeStep;
+	}
+	return accel;
 }
