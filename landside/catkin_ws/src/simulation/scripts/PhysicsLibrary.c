@@ -110,3 +110,17 @@ float* getAcc(float* prevVel, float* currVel, float timeStep){
 	}
 	return accel;
 }
+
+
+float* getPos(int objectHandle){
+    float* position = (float*) malloc(sizeof(float)*3);
+    position = simgetObjectPosition(objectHandle, -1, NULL);
+    return position;
+}
+
+void applyAngDrag(float* torque, int objectHandle){
+    simAddForceAndTorque(objectHandle, NULL, torque);
+    free(torque);
+}
+
+
