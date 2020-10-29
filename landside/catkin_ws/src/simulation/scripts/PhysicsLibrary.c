@@ -1,6 +1,7 @@
 #define RHO 1000            // density of water
 #define WATER_HEIGHT 0      // the z height of the water
 #define QUADRATIC_DRAG 1    // true is drag should be quadratic, rather than linear
+#define PI 3.14159
 
 float grav_vector[3];
 float grav;
@@ -84,7 +85,6 @@ void applyLinDrag(float* force, int objectHandle){
     simAddForceAndTorque(objectHandle, force, NULL);
     free(force); //maybe?
 }
-
 float* getPos(int objectHandle){
     int posSize = 3;
     float* pos = (float*) malloc(sizeof(float) * posSize);
@@ -92,7 +92,6 @@ float* getPos(int objectHandle){
     int errorCode = simGetObjectPosition(objectHandle, relativeToObjectHandle, pos);
     return pos;
 }
-
 float* getLinVelocity(int objectHandle){
 	int velSize = 3;
 	float* linVel = (float*) malloc(sizeof(float) * velSize);
@@ -120,15 +119,19 @@ float* getAcc(float* prevVel, float* currVel, float timeStep){
 }
 
 
-float* getPos(int objectHandle){
-    float* position = (float*) malloc(sizeof(float)*3);
-    position = simgetObjectPosition(objectHandle, -1, NULL);
-    return position;
-}
 
 void applyAngDrag(float* torque, int objectHandle){
     simAddForceAndTorque(objectHandle, NULL, torque);
     free(torque);
 }
 
-
+float* getAngDrag(float dragCoeff, float* angVel, float r, float height){
+    float mu = 8.9 * 0.0001;
+    float* angDrag = (float*)malloc(sizeof(float)*3);
+    angDrag[0] = 2*PI*mu*r*height*angVel[0];
+    angDrag[1] = 2*PI*mu*r*height*angVel[1] + 2*(0.2)*(PI)(dragCoeff)(RHO)(angVel[1]*angVel[1])*(r*r*r*r*r)
+                 PI*(angVel[1]*angVel[1])*(r*r*r*r)*(height)*RHO*dragCoeff;
+    angDrag[2] = 2*PI*mu*r*height*angVel[2] + 2*(0.2)*(PI)(dragCoeff)(RHO)(angVel[2]*angVel[2])*(r*r*r*r*r)
+                 PI*(angVel[2]*angVel[2])*(r*r*r*r)*(height)*RHO*dragCoeff;
+    return angDrag;
+} 
