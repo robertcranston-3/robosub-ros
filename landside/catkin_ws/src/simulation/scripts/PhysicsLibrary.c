@@ -1,3 +1,5 @@
+#include <vector>
+
 #define RHO 1000            // density of water
 #define WATER_HEIGHT 0      // the z height of the water
 #define QUADRATIC_DRAG 1    // true is drag should be quadratic, rather than linear
@@ -20,10 +22,6 @@ unsigned char simStart(void* reserved,int reservedInt){ // called at the beginni
     grav = grav_vector[2];
 
     return 1;
-}
-
-float* getLinearDrag(float dragCoef, float* linVel, float diameter, float height){
-	float dragForce = 0.5 * 1000 * dragCoef * area * 
 }
 
 int applyBuoyancy(int handle, float* centerOfBuoy) {
@@ -118,8 +116,6 @@ float* getAcc(float* prevVel, float* currVel, float timeStep){
 	return accel;
 }
 
-
-
 void applyAngDrag(float* torque, int objectHandle){
     simAddForceAndTorque(objectHandle, NULL, torque);
     free(torque);
@@ -135,3 +131,34 @@ float* getAngDrag(float dragCoeff, float* angVel, float r, float height){
                  PI*(angVel[2]*angVel[2])*(r*r*r*r)*(height)*RHO*dragCoeff;
     return angDrag;
 } 
+
+float** get_thrusterforces(thrusterValues*, thrusterPower, directions**, flipped*){
+
+    float d0[3] = {sqrt(2), sqrt(2), 0};
+    float d1[3] = {sprt(2), -1*sqrt(2), 0};
+    float d2[3] = {-1*sqrt(2),sqrt(2), 0};
+    float d3[3] = {-1*sqrt(2),-1*sqrt(2), 0};
+    float d4[3] = {0, 0, -1};
+    float d5[3] = {0, 0, -1};
+    float d6[3] = {0, 0, -1};
+    float d7[3] = {0, 0, -1};
+
+    *(directions) = d0;
+    *(directions+1) = d1;
+    *(directions+2) = d2;
+    *(directions+3) = d3;
+    *(directions+4) = d4;
+    *(directions+5) = d5;
+    *(directions+6) = d6;
+    *(directions+7) = d7;
+
+    flipThrusters(forces)
+
+    float** thrusterforces =
+    } 
+
+void apply_thrusterForces(float** thrusterForces, float** thrusterPositions, int objectHandle){
+    for (int i = 0; i < 8; i++){
+        simAddForce(objectHandle, *(thrusterPositions+i), *()
+    }
+}
