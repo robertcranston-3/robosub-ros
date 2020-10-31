@@ -3,7 +3,9 @@
 #define RHO 1000            // density of water
 #define WATER_HEIGHT 0      // the z height of the water
 #define QUADRATIC_DRAG 1    // true is drag should be quadratic, rather than linear
-#define PI 3.14159
+#define PI 3.1415926535897932384626433832
+
+using namespace std; 
 
 using namespace std;
 
@@ -26,15 +28,15 @@ unsigned char simStart(void* reserved,int reservedInt){ // called at the beginni
     return 1;
 }
 
-int applyBuoyancy(int handle, float* centerOfBuoy) {
-    float buoy[3];
-    if (calcBuoyancy(handle, buoy) != 0) return -1;
-    if (simAddForce(handle, buoy, centerOfBuoy) != 0) return -1;
+int applyBuoyancy(int handle, vector<float> centerOfBuoy) {
+    vector<float> buoy(3,0);
+    if (calcBuoyancy(handle, buoy.data()) != 0) return -1;
+    if (simAddForce(handle, buoy.data(), centerOfBuoy.data()) != 0) return -1;
 
     return 0;
 }
 
-int calcBuoyancy(int handle, float* buoy) {
+int calcBuoyancy(int handle, vector<float> buoy) {
     // buoyancy = rho * V * g, where V is volume of object underwater
     // calculates V assuming the object fills the entire space of its bounding box
     float minsize[3];
@@ -68,36 +70,37 @@ int calcBuoyancy(int handle, float* buoy) {
     buoy[0] = 0;
     buoy[1] = 0;
     buoy[2] = buoyForce;
+
+    return 0;
 }
 
-float* getLinDrag(float dragCoef, float* linVel, int linVelSize, float diameter, float length){
+vector<float> getLinDrag(float dragCoef, vector<float> linVel, int linVelSize, float diameter, float length){
     float* dragForce = (float*) malloc(3 * sizeof(float));
-    float pi = 3.1415926535897932384626433832;
+    vector<float> dragForce(3, 0);
 
 	for (int i = 1; i < 3; i++){
 		dragForce[i] = -0.5 * RHO * dragCoef * * linVel[i] * linVel[i];
 	}
-    dragForce[0] = -0.5 * RHO * dragCoef * pi * diameter * length * 0.5 * (diameter / 2)*(diameter / 2) * pi * linVel[i] * linVel[i];
+    dragForce[0] = -0.5 * RHO * dragCoef * PI * diameter * length * 0.5 * (diameter / 2)*(diameter / 2) * pi * linVel[i] * linVel[i];
     return dragForce;
 }
 
-void applyLinDrag(float* force, int objectHandle){
-    simAddForceAndTorque(objectHandle, force, NULL);
-    free(force); //maybe?
+void applyLinDrag(vector<float> force, int objectHandle){
+    simAddForceAndTorque(objectHandle, force.data(), NULL);
 }
-float* getPos(int objectHandle){
+
+vector<float> getPos(int objectHandle){
     int posSize = 3;
-    float* pos = (float*) malloc(sizeof(float) * posSize);
+    vector<float> pos(posSize,0);
     int relativeToObjectHandle = -1;
-    int errorCode = simGetObjectPosition(objectHandle, relativeToObjectHandle, pos);
+    int errorCode = simGetObjectPosition(objectHandle, relativeToObjectHandle, pos.data());
     return pos;
 }
-float* getLinVelocity(int objectHandle){
+
+vector<float> getLinVelocity(int objectHandle){
 	int velSize = 3;
-	float* linVel = (float*) malloc(sizeof(float) * velSize);
-	float* angVel = (float*) malloc(sizeof(float) * velSize);
-	int errorCode = simGetObjectVelocity(objectHandle, linVel, angVel);
-	free(angVel);
+	vector<float> linVel(velSize, 0);
+	int errorCode = simGetObjectVelocity(objectHandle, linVel.data(), NULL);
 	return linVel;
 }
 
@@ -108,10 +111,10 @@ vector<float> getAngVelocity(int objectHandle){
 	return angVel;
 }
 
-float* getAcc(float* prevVel, float* currVel, float timeStep){
-	float* accel = (float*) malloc(sizeof(float) * 3);
+vector<float> getAcc(vector<float> prevVel, vector<float> currVel, float timeStep){
+    vector<float> accel(velSize, 0);
 	for (int i = 0; i < 3; i++){
-		*(accel+i) = (*(currVel+i) - *(prevVel+i)) / timeStep;
+		accel[i] = (currVel[i] - prevVel[i]) / timeStep;
 	}
 	return accel;
 }
@@ -131,7 +134,7 @@ vector<float> getAngDrag(float dragCoeff, vector<float> angVel, float r, float h
     return angDrag;
 } 
 
-float** get_thrusterforces(thrusterValues*, thrusterPower, directions**, flipped*){
+vector<vector<float> > get_thrusterforces(vector<float> thrusterValues, float thrusterPower){
 
     float d0[3] = {sqrt(2), sqrt(2), 0};
     float d1[3] = {sprt(2), -1*sqrt(2), 0};
@@ -151,13 +154,21 @@ float** get_thrusterforces(thrusterValues*, thrusterPower, directions**, flipped
     *(directions+6) = d6;
     *(directions+7) = d7;
 
-    flipThrusters(forces)
+    vector<int> flipped{-1,-1,1,-1,1,-1,-1,1};
 
-    float** thrusterforces =
-    } 
-
-void apply_thrusterForces(float** thrusterForces, float** thrusterPositions, int objectHandle){
+    vector<vector<float> > thrusterForces(8);
     for (int i = 0; i < 8; i++){
-        simAddForce(objectHandle, *(thrusterPositions+i), *()
+        thrusterForces[i] = vector<float>(3);
+        for (int j = 0; j < 3; j++){
+            thrusterForces[i][j] = *(*(directions+i)+j) * thrusterPower * thrusterValues[i];
+        }
+    }
+    return thrusterForces
+} 
+
+void apply_thrusterForces(vector<vector<float> > thrusterForces, vector<vector<float> > thrusterPositions, int objectHandle){
+
+    for (int i = 0; i < 8; i++){
+        simAddForce(objectHandle, thrusterPositions[i].data(), thrusterForces[i].data());
     }
 }
