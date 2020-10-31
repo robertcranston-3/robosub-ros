@@ -5,6 +5,8 @@
 #define QUADRATIC_DRAG 1    // true is drag should be quadratic, rather than linear
 #define PI 3.14159
 
+using namespace std;
+
 float grav_vector[3];
 float grav;
 
@@ -99,12 +101,10 @@ float* getLinVelocity(int objectHandle){
 	return linVel;
 }
 
-float* getAngVelocity(int objectHandle){
+vector<float> getAngVelocity(int objectHandle){
 	int velSize = 3;
-	float* linVel = (float*) malloc(sizeof(float) * velSize);
-	float* angVel = (float*) malloc(sizeof(float) * velSize);
-	int errorCode = simGetObjectVelocity(objectHandle, linVel, angVel);
-	free(linVel);
+    vector<float> angVel(velSize,0);
+	int errorCode = simGetObjectVelocity(objectHandle, NULL, angVel.data());
 	return angVel;
 }
 
@@ -116,14 +116,13 @@ float* getAcc(float* prevVel, float* currVel, float timeStep){
 	return accel;
 }
 
-void applyAngDrag(float* torque, int objectHandle){
-    simAddForceAndTorque(objectHandle, NULL, torque);
-    free(torque);
+void applyAngDrag(vector<float> torque, int objectHandle){
+    simAddForceAndTorque(objectHandle, NULL, torque.data());
 }
 
-float* getAngDrag(float dragCoeff, float* angVel, float r, float height){
+vector<float> getAngDrag(float dragCoeff, vector<float> angVel, float r, float height){
     float mu = 8.9 * 0.0001;
-    float* angDrag = (float*)malloc(sizeof(float)*3);
+    vector<float> angDrag(3,0);
     angDrag[0] = 2*PI*mu*r*height*angVel[0];
     angDrag[1] = 2*PI*mu*r*height*angVel[1] + 2*(0.2)*(PI)(dragCoeff)(RHO)(angVel[1]*angVel[1])*(r*r*r*r*r)
                  PI*(angVel[1]*angVel[1])*(r*r*r*r)*(height)*RHO*dragCoeff;
