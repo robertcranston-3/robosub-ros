@@ -4,9 +4,11 @@
 //#include "stackMap.h"
 //#include "simLib.h"
 
-#include "stack/stackArray.h"
-#include "stack/stackMap.h"
-#include "simLib.h"
+//extern "C" {
+    #include "stack/stackArray.h"
+    #include "stack/stackMap.h"
+    #include "simLib.h"
+//}
 
 #include <iostream>
 
@@ -45,8 +47,8 @@ int calcBuoyancy(int handle, float* buoy) {
     float objsize[3];
 
     for (int i = 0; i < 2; i++) {
-        if (simGetObjectFloatParameter(handle, 15+i, minsize+i) != 0) return -1;
-        if (simGetObjectFloatParameter(handle, 18+i, maxsize+i) != 0) return -1;
+        if (simGetObjectFloatParameter(handle, 15+i, minsize+i) != 0);// return -1;
+        if (simGetObjectFloatParameter(handle, 18+i, maxsize+i) != 0);// return -1;
         objsize[i] = maxsize[i] - minsize[i];
     }
 
@@ -67,8 +69,10 @@ int calcBuoyancy(int handle, float* buoy) {
     vol *= zdepth;
 
     float grav_vector[3];
-    if (simGetArrayParameter(sim_arrayparam_gravity, grav_vector)) return 0;
+    simGetArrayParameter(sim_arrayparam_gravity, grav_vector);
     float grav = grav_vector[2];
+
+    printf("rho %d, vol %f, grav %f\n", RHO, vol, grav);
 
     float buoyForce = RHO * vol * grav;
 
@@ -89,6 +93,7 @@ void LUA_SIMPLEBUOY_CALLBACK(SScriptCallBack* p)
 
     CStackArray inArguments;
     inArguments.buildFromStack(stack);
+    simAddLog("Libtest", sim_verbosity_msgs, "in thing addlog");
 
     if ( (inArguments.getSize()>=2)&&inArguments.isString(0)&&inArguments.isNumber(1) )
     { // we expect at least 2 arguments: a string and a map
@@ -98,6 +103,7 @@ void LUA_SIMPLEBUOY_CALLBACK(SScriptCallBack* p)
         tmp+=") and also the handle (";
         tmp+=inArguments.getInt(1);
         tmp+=")";
+        printf("args: %s, %d\n", inArguments.getString(0).c_str(), inArguments.getInt(1));
 
         int handle = inArguments.getInt(1);
 
@@ -105,7 +111,11 @@ void LUA_SIMPLEBUOY_CALLBACK(SScriptCallBack* p)
         float center[3] = {0,0,.5};
         float force[3] = {0,0,.5};
         calcBuoyancy(handle, force);
+        //force[2] = 12;
+        printf("after calc buoy\n");
+        printf("buoy force: %f, %f, %f\n", force[0], force[1], force[2]);
         simAddForce(handle, center, force);
+        printf("after add force\n");
     }
     else
         simSetLastError(LUA_SIMPLEBUOY_COMMAND,"Not enough arguments or wrong arguments.");
@@ -121,6 +131,7 @@ void LUA_SIMPLEBUOY_CALLBACK(SScriptCallBack* p)
     map->setArray("position",pos);
     outArguments.pushMap(map);
     outArguments.buildOntoStack(stack);
+    printf("end\n");
 }
 // --------------------------------------------------------------------------------------
 
@@ -178,10 +189,10 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
     }
 
     // Implicitely include the script lua/simExtPluginSkeleton.lua:
-    simRegisterScriptVariable("simSkeleton","require('simExtPluginSkeleton')",0);
+    simRegisterScriptVariable("simSkeleton","require('simExtLibTest')",0);
 
     // Register the new function:
-    simRegisterScriptCallbackFunction(strConCat(LUA_SIMPLEBUOY_COMMAND,"@","PluginSkeleton"),strConCat("...=",LUA_SIMPLEBUOY_COMMAND,"(string data1,map data2)"),LUA_SIMPLEBUOY_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_SIMPLEBUOY_COMMAND,"@","PluginSkeleton"),strConCat("...=",LUA_SIMPLEBUOY_COMMAND,"(string data1, number data2)"),LUA_SIMPLEBUOY_CALLBACK);
 
     return(PLUGIN_VERSION); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
 }
