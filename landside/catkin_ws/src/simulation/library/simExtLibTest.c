@@ -46,24 +46,23 @@ int calcBuoyancy(int handle, float* buoy) {
     float maxsize[3];
     float objsize[3];
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         if (simGetObjectFloatParameter(handle, 15+i, minsize+i) != 0);// return -1;
         if (simGetObjectFloatParameter(handle, 18+i, maxsize+i) != 0);// return -1;
+        printf("min %f, max %f\n", minsize[i], maxsize[i]);
         objsize[i] = maxsize[i] - minsize[i];
     }
 
     float vol = objsize[0] * objsize[1];
     float zdepth; // the amount that the robot is below the water
+    float pos[3];
 
-    // this whole block can probably be condensed into a one liner
-    // but I'm leaving it as is for now because I want to logic to be explicit, in the likely event
-    // that we have to change it in the near future.
-    if (minsize[2] > WATER_HEIGHT) {
-        zdepth = 0;
-    } else if (maxsize[2] < WATER_HEIGHT) {
+    simGetObjectPosition(handle, -1, pos);
+
+    if (objsize[2] <= WATER_HEIGHT - pos[2]) {
         zdepth = objsize[2];
     } else {
-        zdepth = WATER_HEIGHT - minsize[2];
+        zdepth = WATER_HEIGHT - pos[2];
     }
 
     vol *= zdepth;
@@ -74,7 +73,7 @@ int calcBuoyancy(int handle, float* buoy) {
 
     printf("rho %d, vol %f, grav %f\n", RHO, vol, grav);
 
-    float buoyForce = RHO * vol * grav;
+    float buoyForce = RHO * vol * grav * -1; // act opposite gravity
 
     buoy[0] = 0;
     buoy[1] = 0;
